@@ -18,7 +18,7 @@ public class NewCustomisation : MonoBehaviour
     public int[] pieceSelector = new int[] {0,0,0,0,0,0,0};
     int arrayIndex;
     public Material[] mat;
-
+    public bool positive;
     public Text[] matNum;
 
     public void Start()
@@ -27,35 +27,42 @@ public class NewCustomisation : MonoBehaviour
         Randomise();
     }
 
-    public void LoadTextures(int arrayIndexer)
+    public void NextTexture(int arrayIndex)
     {
-        arrayIndex = arrayIndexer;
-        mat = characterRenderer.materials;
-        mat[arrayIndex].mainTexture = textureOverlord[arrayIndex][pieceSelector[arrayIndex]];
-        characterRenderer.materials = mat;
-        //matNum[arrayIndex].text = pieceSelector[arrayIndex].ToString();
-    }
+        LoadTextures(positive);
 
-    public void NextTexture(bool positive)
-    { 
-        if (positive == true)
+        if (positive)
             pieceSelector[arrayIndex]++;
         else
             pieceSelector[arrayIndex]--;
+
 
         if(pieceSelector[arrayIndex] > (textureOverlord[arrayIndex].Length -1 ))
             pieceSelector[arrayIndex] = 0;
 
         if(pieceSelector[arrayIndex] < 0)
             pieceSelector[arrayIndex] = textureOverlord[arrayIndex].Length - 1;
+
+        mat = characterRenderer.materials;
+        mat[arrayIndex].mainTexture = textureOverlord[arrayIndex][pieceSelector[arrayIndex]];
+        characterRenderer.materials = mat;
+        matNum[arrayIndex].text = pieceSelector[arrayIndex].ToString();
     }
+
+    public void LoadTextures(bool pos)
+    {
+        positive = pos;
+    }
+
 
     public void Randomise()
     {
         for (int i = 1; i < pieceSelector.Length; i++)
         {
             pieceSelector[i] = Random.Range(0, textureOverlord[i].Length);
-            LoadTextures(i);
+            matNum[i].text = pieceSelector[i].ToString();
+            LoadTextures(positive);
         }
+
     }
 }

@@ -7,60 +7,69 @@ namespace player
 {
     public class RaceManager : MonoBehaviour
     {
-        public int[] baseStats = { 20, 20, 20, 20, 20, 20 };
-        public int[] racialStats = { 0, 0, 0, 0, 0, 0 };
-        public int[] mutibleStats = { 5, 5, 5, 5, 5, 5 };
-        public int selectedRace;
-        public int[] basicStats;
+        public int[][] stats;
+        public int[] statTotal;
+        public int[] raceBonus;
+        public int[] mutibleStats;
 
-        public Text[] baseStatText;
-        public Text[] racialStatText;
-        public Text[] basicStatText;
+        public Text[][] statDisplay;
+        public Text[] statTotalText;
+        public Text[] raceBonusText;
         public Text[] mutibleStatsText;
+
+        public int pointPool;
+        public bool positive;
+
 
         public void Start()
         {
-            CalculateStats();
-            DisplayStats();
+            statDisplay = new Text[][] { statTotalText, raceBonusText, mutibleStatsText };
+            stats = new int[][] { statTotal, raceBonus, mutibleStats };
+
+            raceBonus = new int[] { 0, 0, 0, 0, 0, 0 };
+            mutibleStats = new int[] { 10, 10, 10, 10, 10, 10 };
+            pointPool = 10;
+
+            StatUpdate();
         }
 
-        public virtual void CalculateStats()
+        public void AddStat(int index)
         {
-            for (int i = 0; i < basicStats.Length; i++)
+            AddStat(index, 1);
+        }
+        public void RemoveStat(int index)
+        {
+            AddStat(index, -1);
+        }
+
+        public void AddStat(int index, int ammount)
+        {
+            if (pointPool > 0 || mutibleStats[index] > 8)
             {
-                basicStats[i] = baseStats[i] + mutibleStats[i] + racialStats[i];
+                pointPool -= ammount;
+                mutibleStats[index] += ammount;
             }
         }
 
-        public void DisplayStats()
+
+        public void Increasing(bool pos)
         {
-            for (int i = 0; i < basicStats.Length; i++)
+            positive = pos;
+        }
+
+
+        public void StatUpdate()
+        {
+            for (int i = 0; i < statTotal.Length; i++)
             {
-                basicStatText[i].text = basicStats[i].ToString();
-                mutibleStatsText[i].text = mutibleStats[i].ToString();
-                racialStatText[i].text = racialStats[i].ToString();
+                statTotal[i] = raceBonus[i] + mutibleStats[i];
+
+                for (int x = 0; x < statDisplay[i].Length; x++)
+                {
+                    statDisplay[i][x].text = stats[i][x].ToString();
+                }
             }
         }
-
-    }
-
-    public class Human : RaceManager
-    {
-        public override void CalculateStats()
-        {
-            base.CalculateStats();
-
-        }
-    }
-
-    public class Elf : RaceManager
-    {
-
-    }
-
-    public class Dwarf : RaceManager
-    {
-
     }
 }
 
