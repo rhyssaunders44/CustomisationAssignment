@@ -61,8 +61,7 @@ public class NewCustomisation : MonoBehaviour
         {
             pieceSelector[i] = Random.Range(0, textureOverlord[i].Length);
             matNum[i].text = pieceSelector[i].ToString();
-            LoadTextures(positive);
+            NextTexture(i);
         }
-
     }
 }
