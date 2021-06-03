@@ -16,7 +16,6 @@ public class NewCustomisation : MonoBehaviour
 
     public Renderer characterRenderer;
     public int[] pieceSelector = new int[] {0,0,0,0,0,0,0};
-    int arrayIndex;
     public Material[] mat;
     public bool positive;
     public Text[] matNum;

@@ -371,7 +371,7 @@ namespace player
                 {
                     int[] regen = regenStats[x];
 
-                    //if the current amout is less than the max
+                    //if the current amount is less than the max
                     if (regen[1] < regen[0])
                     {
                         //add the regen amount for that stat
