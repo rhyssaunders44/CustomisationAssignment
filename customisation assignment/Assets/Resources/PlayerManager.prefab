@@ -1,0 +1,270 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7342589765152649474
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7470668694639743293}
+  - component: {fileID: 2384432987939700642}
+  - component: {fileID: 2027957445877113285}
+  - component: {fileID: 3696943925726692421}
+  - component: {fileID: 4257314824917235936}
+  - component: {fileID: 7547095232416948758}
+  m_Layer: 0
+  m_Name: PlayerManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7470668694639743293
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0}
+  m_LocalPosition: {x: 0.026386945, y: -0.028995488, z: -0.09558414}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2384432987939700642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf0542c3205313b4e8dc758a58271822, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterName: 
+  characterClass: 0
+  selectedClass:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  selectedClassIndex: 0
+  baseStats: 
+  tempstats: 
+  showDropDownMenu: 0
+  ScrollPos: {x: 0, y: 0}
+  ClassButton: 
+  statPoints: 10
+  skin: []
+  eyes: []
+  hair: []
+  mouth: []
+  armour: []
+  clothes: []
+  skinIndex: 4
+  eyesIndex: 4
+  mouthIndex: 3
+  hairIndex: 5
+  armourIndex: 11
+  clothesIndex: 11
+  characterRenderer: {fileID: 0}
+  skinMax: 4
+  eyesMax: 4
+  mouthMax: 3
+  hairMax: 5
+  armourMax: 11
+  clothesMax: 11
+  matName:
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+--- !u!114 &2027957445877113285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7983ddb0179734d499ac7258fc0bf3b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skins:
+  - {fileID: 2800000, guid: 8d4abc0f05192c7468d7ad48e9c0e54c, type: 3}
+  - {fileID: 2800000, guid: f978e771d28ced4469afcf1ae763bbbe, type: 3}
+  - {fileID: 2800000, guid: 614e2e0108ec4184fadc4498e4876a15, type: 3}
+  - {fileID: 2800000, guid: 3bb5fa32419291f42903f321eb3bd09b, type: 3}
+  eyes:
+  - {fileID: 2800000, guid: 5a312d85ed34adf41a52a90f3ee7b765, type: 3}
+  - {fileID: 2800000, guid: 2efc05ac369f9a54284cfa32d3a86d1a, type: 3}
+  - {fileID: 2800000, guid: db68c7a585ec72a4ead46ca0c2d7e5d5, type: 3}
+  - {fileID: 2800000, guid: 8291af56477933341b442c15f7678067, type: 3}
+  hair:
+  - {fileID: 2800000, guid: 08d055a0fcff82648bc34445c0bc2c56, type: 3}
+  - {fileID: 2800000, guid: cb0517ffb8b07a7469ea966260f40bd8, type: 3}
+  - {fileID: 2800000, guid: c0c75bdf25df60f45b41b410e6dc4645, type: 3}
+  - {fileID: 2800000, guid: 75958d7db7489dd4c85231aa69271abf, type: 3}
+  - {fileID: 2800000, guid: 21c6729bc35152847bc2e491c871c37d, type: 3}
+  mouth:
+  - {fileID: 2800000, guid: 486ea96d1007bef4bb06d8cb1dbc2851, type: 3}
+  - {fileID: 2800000, guid: a606dd5c1ef303b448016705d055c4e9, type: 3}
+  - {fileID: 2800000, guid: 5fc3257278a0e8e42bd4dcd9a2f26d9b, type: 3}
+  clothes:
+  - {fileID: 2800000, guid: e170ff68aaeed8e409ab509dcb1f8952, type: 3}
+  - {fileID: 2800000, guid: ab10e35eb45941c4f841703493659ae6, type: 3}
+  - {fileID: 2800000, guid: 0401f2cafb3577f41bacee45cff3f0ff, type: 3}
+  - {fileID: 2800000, guid: 3baf96f5dbebe134a8344f17c6969b53, type: 3}
+  - {fileID: 2800000, guid: 53cadb5d6eb694f4ebeb916a87dfec4e, type: 3}
+  - {fileID: 2800000, guid: 1b6dc03374bf2a04b9a5d17fc652aad6, type: 3}
+  - {fileID: 2800000, guid: 9b67e461993eb91478982b3a53e5586a, type: 3}
+  - {fileID: 2800000, guid: ed6a6534852214847aebe52fb5bc7566, type: 3}
+  - {fileID: 2800000, guid: c60b35359157aaa488d195ebd6d0d32b, type: 3}
+  - {fileID: 2800000, guid: 3081dce852f044740bd028fbc40ea71c, type: 3}
+  - {fileID: 2800000, guid: eb297af6eacebb54296e400c87b7ce30, type: 3}
+  armour:
+  - {fileID: 2800000, guid: 4d5cd63dcdfe0434fa5639cf1ab9b875, type: 3}
+  - {fileID: 2800000, guid: 30c209bec48b24144a1193cdd1956083, type: 3}
+  - {fileID: 2800000, guid: bbdfeeb3f57083748baa0eb561cb1f81, type: 3}
+  - {fileID: 2800000, guid: 215ae191261e867418bc917544b08854, type: 3}
+  - {fileID: 2800000, guid: e790b656546cb33478dd667d331ed24d, type: 3}
+  - {fileID: 2800000, guid: 932ece08fd659ab47acd5a3a7b2d02d0, type: 3}
+  - {fileID: 2800000, guid: 7fb7303cf729f2c47904c81f2d6022e9, type: 3}
+  - {fileID: 2800000, guid: a0eec7cc9d683314490e6aaebabdf039, type: 3}
+  - {fileID: 2800000, guid: d259ab87c61a4f14a8ff6210c0ee786b, type: 3}
+  - {fileID: 2800000, guid: b831426dbe897504db107e11158d7d16, type: 3}
+  - {fileID: 2800000, guid: 8caf7d2dd53efe549a25b2486055c4f1, type: 3}
+  characterRenderer: {fileID: 0}
+  mat:
+  - {fileID: 2100000, guid: c393f3aef2478964a85bb6465e3e9f24, type: 2}
+  - {fileID: 2100000, guid: e571a14f4f3940e4e9639d2b12b5e424, type: 2}
+  - {fileID: 2100000, guid: e1bbe8ee89c0f9a4fbd5ba929c0aeaae, type: 2}
+  - {fileID: 2100000, guid: b942637c78462d248834ca8ef43eae5b, type: 2}
+  - {fileID: 2100000, guid: 3124a4357d0d5a44185098d7d1858dd3, type: 2}
+  - {fileID: 2100000, guid: 6a960edb0075b8a4ba5ea84a3b24a3a8, type: 2}
+  - {fileID: 2100000, guid: bdf4287d6bd484b4181df900422a4421, type: 2}
+  positive: 0
+  matNum:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  loadedCharcter: {fileID: 0}
+  nameEnter: {fileID: 0}
+--- !u!114 &3696943925726692421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87870c44b6b705942815d79f0b46dce7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  statTotal: 000000000000000000000000000000000000000000000000
+  mutibleStats: 000000000000000000000000000000000000000000000000
+  statIndex: 0
+  statTotalText:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  mutibleStatsText:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  raceStatsText:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  pointPoolText: {fileID: 0}
+  raceName: {fileID: 0}
+  raceAbilityText: {fileID: 0}
+  raceNames: []
+  raceAbilityString: []
+  hudNames: []
+  hpDisplay:
+  - {fileID: 0}
+  - {fileID: 0}
+  staminaDisplay:
+  - {fileID: 0}
+  - {fileID: 0}
+  manaDisplay:
+  - {fileID: 0}
+  - {fileID: 0}
+  hudStats:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  statBars:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  characterCreationObject:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  hudObject:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  xpTracker: {fileID: 0}
+  levelCounter: {fileID: 0}
+  running: 0
+--- !u!114 &4257314824917235936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de987de90529e5f40915949dde9d6942, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  saveName: 
+  saveDropDown: {fileID: 0}
+--- !u!114 &7547095232416948758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7342589765152649474}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50158b56e69299c44aece3fdc61bb708, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

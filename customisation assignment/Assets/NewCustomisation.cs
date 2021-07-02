@@ -15,15 +15,30 @@ public class NewCustomisation : MonoBehaviour
     Texture2D[][] textureOverlord = new Texture2D[7][];
 
     public Renderer characterRenderer;
-    public int[] pieceSelector = new int[] {0,0,0,0,0,0,0};
+
+    public static int[] pieceSelector = new int[] {0,0,0,0,0,0,0};
     public Material[] mat;
     public bool positive;
     public Text[] matNum;
+    public Text loadedCharcter;
+
+    public InputField nameEnter;
+    public static string characterName;
 
     public void Start()
     {
+
         textureOverlord = new Texture2D[][] {null, skins, eyes, hair, mouth, clothes, armour };
-        Randomise();
+
+        if (GameSceneManager.loadCharacter)
+        {
+            ReLoadTextures();
+            InGameLoad();
+        }
+        else
+        {
+            Randomise();
+        }
     }
 
     public void NextTexture(int arrayIndex)
@@ -45,6 +60,7 @@ public class NewCustomisation : MonoBehaviour
         mat = characterRenderer.materials;
         mat[arrayIndex].mainTexture = textureOverlord[arrayIndex][pieceSelector[arrayIndex]];
         characterRenderer.materials = mat;
+
         matNum[arrayIndex].text = pieceSelector[arrayIndex].ToString();
     }
 
@@ -62,5 +78,39 @@ public class NewCustomisation : MonoBehaviour
             matNum[i].text = pieceSelector[i].ToString();
             NextTexture(i);
         }
+    }
+
+    public void NameInput(bool save)
+    {
+        if (save)
+        {
+            characterName = nameEnter.text;
+            loadedCharcter.text = characterName + " has been created!";
+        }
+        else
+        {
+            characterName = DataMaster.characterName;
+            loadedCharcter.text = characterName + " has been Loaded!";
+        }
+    }
+
+    public void InGameLoad()
+    {
+        characterName = DataMaster.characterName;
+        loadedCharcter.text = characterName;
+    }
+
+    public void ReLoadTextures()
+    {
+        mat = characterRenderer.materials;
+
+        for (int i = 1; i < textureOverlord.Length; i++)
+        {
+            mat[i].mainTexture = textureOverlord[i][DataMaster.hairCut[i]];
+
+            matNum[i].text = DataMaster.hairCut[i].ToString();
+        }
+
+        loadedCharcter.text = "Character Loaded";
     }
 }

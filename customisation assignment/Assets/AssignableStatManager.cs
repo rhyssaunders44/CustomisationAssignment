@@ -8,11 +8,11 @@ namespace player
     public class AssignableStatManager : MonoBehaviour
     {
         #region stat Setup
-        public int[][] stats;
+        public static int[][] stats;
         public int[] statTotal;
         public int[] mutibleStats;
         public int[][] raceStats;
-        public int selectRace;
+        public static int selectRace;
         public int statIndex;
 
         public Text[][] statDisplay;
@@ -24,7 +24,7 @@ namespace player
         public Text raceName;
         public Text raceAbilityText;
 
-        public int pointPool = 10;
+        public static int pointPool = 10;
         bool positive;
 
         public string[] raceNames;
@@ -39,10 +39,11 @@ namespace player
         }
         #endregion
 
-        int[][] regenStats;
+        public static int[][] regenStats;
         int[] hp;
         int[] stamina;
         int[] mana;
+        float movementSpeed;
 
         public Text[][] playerResourcesDisplay;
         public Text[] hpDisplay;
@@ -119,10 +120,19 @@ namespace player
             xpMax = 60;
             levelMax = 20;
 
-            // all of the hud objects are off
-            for (int i = 0; i < hudObject.Length; i++)
+            if (!GameSceneManager.loadCharacter)
             {
-                hudObject[i].SetActive(false);
+                // all of the hud objects are off
+                for (int i = 0; i < hudObject.Length; i++)
+                {
+                    hudObject[i].SetActive(false);
+                }
+
+            }
+            else
+            {
+                onCharacterLoad();
+                FinishCharacter();
             }
 
             //update the in-game stats when the game loads
@@ -134,9 +144,6 @@ namespace player
             //deal damage to the player 
             if (Input.GetKeyDown(KeyCode.P))
             {
-                //stops overlapping the coroutines to make the regen happen more than once per second
-                StopCoroutine("StatRegen");
-                isFull = false;
                 TakeDamage();
             }
 
@@ -146,8 +153,6 @@ namespace player
                 //cast a spell if you have enough mana, same concept with the regen
                 if (regenStats[2][1] > spellCost)
                 {
-                    StopCoroutine("StatRegen");
-                    isFull = false;
                     CastSpell();
                 }
             }
@@ -156,13 +161,13 @@ namespace player
             if (Input.GetKeyDown(KeyCode.LeftShift) && regenStats[1][1] > 5)
             {
                 //stop regenning 
-                StopCoroutine("StatRegen");
+                StopCoroutine(StatRegen());
                 //start running
                 running = true;
                 //start reducing stamina
                 StartCoroutine("Run");
                 //start regenning stats again
-                StartCoroutine("StatRegen");
+                StartCoroutine(StatRegen());
             }
 
             //when you stop running stop the coroutine 
@@ -199,10 +204,6 @@ namespace player
             StatUpdate();
         }
 
-        /// <summary>
-        /// removes a stat from the selected stat
-        /// </summary>
-        /// <param name="index"></param>
         public void RemoveStat(int index)
         {
             //remove a point from the correct stat
@@ -216,10 +217,6 @@ namespace player
             StatUpdate();
         }
 
-        /// <summary>
-        /// goes to the next race
-        /// </summary>
-        /// <param name="positive"></param>
         public void nextRace(bool positive)
         {
             if (positive)
@@ -248,10 +245,6 @@ namespace player
             StatUpdate();
         }
 
-        /// <summary>
-        /// allows the race to go both up and down
-        /// </summary>
-        /// <param name="pos"></param>
         public void Increasing(bool pos)
         {
             // needed to add a stat for the add and remove stat since you cant have 2 
@@ -259,15 +252,16 @@ namespace player
             positive = pos;
         }
 
-        /// <summary>
-        /// sets up the in game hud with the characters stats
-        /// </summary>
         public void FinishCharacter()
         {
             // turn off the stat creation panels and turn on the hud items
             for (int i = 0; i < characterCreationObject.Length; i++)
             {
                 characterCreationObject[i].SetActive(false);
+            }
+
+            for (int i = 0; i < hudObject.Length; i++)
+            {
                 hudObject[i].SetActive(true);
             }
 
@@ -278,9 +272,15 @@ namespace player
             LevelUp();
         }
 
-        /// <summary>
-        /// happens when the player levels up
-        /// </summary>
+        public void onCharacterLoad()
+        {
+            stats = DataMaster.characterStats;
+            pointPool = DataMaster.characterPointPool;
+            selectRace = DataMaster.race;
+
+            StatUpdate();
+        }
+
         public void LevelUp()
         {
             float xpbarfill;
@@ -339,10 +339,11 @@ namespace player
         {
             //you are not at full mana
             isFull = false;
+            StopCoroutine(StatRegen());
             //remove mana equal to the spell cost
             regenStats[2][1] = regenStats[2][1] - spellCost;
             // start regening stats
-            StartCoroutine("StatRegen");
+            StartCoroutine(StatRegen());
         }
 
         /// <summary>
@@ -350,12 +351,14 @@ namespace player
         /// </summary>
         public void TakeDamage()
         {
+
             // you are not at full hp anymore
             isFull = false;
+            StopCoroutine(StatRegen());
             //deal a random amount of damage
             regenStats[0][1] = regenStats[0][1] - Random.Range(5, 40);
             //start regening stats
-            StartCoroutine("StatRegen");
+            StartCoroutine(StatRegen());
         }
 
         /// <summary>
@@ -404,7 +407,7 @@ namespace player
         {
             // while youre pressing shift, remove a point of stamina every 0.1 seconds and update the stats
             // as a note moving is not a part of this project and the added condition of velocity > 0
-            while(running == true && regenStats[1][1] > 0)
+            while(running && regenStats[1][1] > 0)
             {
                 regenStats[1][1]--;
                 StatUpdate();
@@ -442,10 +445,11 @@ namespace player
             #endregion
 
             //defines maxhp, max stamina, and max mana in that order
-            #region max stat definition
+            #region ing game stat definition
             regenStats[0][0] = (stats[1][0] * 2) + (stats[1][2] * 5);
             regenStats[1][0] = stats[1][2] * 3;
             regenStats[2][0] = (stats[1][3] * 2) + (stats[1][4] * 4);
+            movementSpeed = 1.1f * stats[1][2];
             #endregion
 
             for (int i = 0; i < regenStats.Length; i++)
