@@ -96,7 +96,7 @@ public class NewCustomisation : MonoBehaviour
 
     public void InGameLoad()
     {
-        characterName = DataMaster.characterName;
+        characterName = PlayerPrefs.GetString("passedLoad");
         loadedCharcter.text = characterName;
     }
 

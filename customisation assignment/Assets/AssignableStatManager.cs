@@ -12,17 +12,23 @@ namespace player
         public int[] statTotal;
         public int[] mutibleStats;
         public int[][] raceStats;
+        public int[][] classStats;
         public static int selectRace;
+        public static int selectClass;
         public int statIndex;
 
         public Text[][] statDisplay;
         public Text[] statTotalText;
         public Text[] mutibleStatsText;
         public Text[] raceStatsText;
+        public Text[] classStatsText;
 
         public Text pointPoolText;
         public Text raceName;
         public Text raceAbilityText;
+        public Text className;
+        public Text classAbilityText;
+
 
         public static int pointPool = 10;
         bool positive;
@@ -31,19 +37,30 @@ namespace player
         public string[] raceAbilityString;
         public string[] hudNames;
 
+        public string[] classNames;
+        public string[] classAbilityString;
+
+
         public class Race
         {
             public string name;
             public int[] raceStats;
             public string racialAbility;
         }
+
+        public class CharacterClass
+        {
+            public string classType;
+            public int[] classBonuses;
+            public string classAbility;
+        }
         #endregion
 
+        #region HUD Stats
         public static int[][] regenStats;
         int[] hp;
         int[] stamina;
         int[] mana;
-        float movementSpeed;
 
         public Text[][] playerResourcesDisplay;
         public Text[] hpDisplay;
@@ -61,6 +78,7 @@ namespace player
         public Text levelCounter;
         int currentLevel;
         int levelMax;
+        #endregion
 
         public bool running;
         int spellCost = 30;
@@ -96,11 +114,33 @@ namespace player
             raceStats = new int[][] { human.raceStats, elf.raceStats, dorf.raceStats, stupid.raceStats };
             mutibleStats = new int[] { 10, 10, 10, 10, 10, 10 };
 
+            selectRace = 0;
+
+
+            CharacterClass Fighter = new CharacterClass();
+            Fighter.classType = "Fighter";
+            Fighter.classBonuses = new int[] { 1, 0, 1, 0, 0, 0 };
+            Fighter.classAbility = "All damage Dealt is increased by 1";
+
+            CharacterClass Mage = new CharacterClass();
+            Mage.classType = "Mage";
+            Mage.classBonuses = new int[] { 0, 0, 0, 1, 1, 0 };
+            Mage.classAbility = "Spells you cast cost 5% less";
+
+            CharacterClass Rogue = new CharacterClass();
+            Rogue.classType = "Rogue";
+            Rogue.classBonuses = new int[] { 0, 1, 0, 0, 0, 1 };
+            Rogue.classAbility = "You deal 2 bonus damage with bows."; 
+
+            classNames = new string[] { Fighter.classType, Mage.classType, Rogue.classType };
+            classStats = new int[][] { Fighter.classBonuses, Mage.classBonuses, Rogue.classBonuses };
+            classAbilityString = new string[] {Fighter.classAbility, Mage.classAbility, Rogue.classAbility };
+
+
             statDisplay = new Text[][] { mutibleStatsText, statTotalText };
             stats = new int[][] { mutibleStats, statTotal };
 
-            selectRace = 0;
-
+            selectClass = 0;
             #endregion
 
             // initialisation of the in-game stats
@@ -127,7 +167,6 @@ namespace player
                 {
                     hudObject[i].SetActive(false);
                 }
-
             }
             else
             {
@@ -161,13 +200,11 @@ namespace player
             if (Input.GetKeyDown(KeyCode.LeftShift) && regenStats[1][1] > 5)
             {
                 //stop regenning 
-                StopCoroutine(StatRegen());
+                StopCoroutine("StatRegen");
                 //start running
                 running = true;
                 //start reducing stamina
                 StartCoroutine("Run");
-                //start regenning stats again
-                StartCoroutine(StatRegen());
             }
 
             //when you stop running stop the coroutine 
@@ -175,6 +212,7 @@ namespace player
             {
                 isFull = false;
                 running = false;
+                StartCoroutine("StatRegen");
             }
 
             // add xp to level up
@@ -245,6 +283,34 @@ namespace player
             StatUpdate();
         }
 
+        public void NextClass(bool positive)
+        {
+            if (positive)
+            {
+                //go to the next class in the array
+                selectClass++;
+
+                //loop the races
+                if (selectClass > classNames.Length - 1)
+                    selectClass = 0;
+            }
+            else
+            {
+                // go to the prevoius array in the list
+                selectRace--;
+
+                //loop the classes
+                if (selectClass < 0)
+                {
+                    selectClass = classNames.Length - 1;
+                }
+
+            }
+
+            //update the UI
+            StatUpdate();
+        }
+    
         public void Increasing(bool pos)
         {
             // needed to add a stat for the add and remove stat since you cant have 2 
@@ -254,17 +320,6 @@ namespace player
 
         public void FinishCharacter()
         {
-            // turn off the stat creation panels and turn on the hud items
-            for (int i = 0; i < characterCreationObject.Length; i++)
-            {
-                characterCreationObject[i].SetActive(false);
-            }
-
-            for (int i = 0; i < hudObject.Length; i++)
-            {
-                hudObject[i].SetActive(true);
-            }
-
             //needed to level up
             xpCurrent = xpMax;
 
@@ -274,9 +329,11 @@ namespace player
 
         public void onCharacterLoad()
         {
+
             stats = DataMaster.characterStats;
             pointPool = DataMaster.characterPointPool;
             selectRace = DataMaster.race;
+            selectClass = DataMaster.characterClass;
 
             StatUpdate();
         }
@@ -339,11 +396,19 @@ namespace player
         {
             //you are not at full mana
             isFull = false;
-            StopCoroutine(StatRegen());
+            StopCoroutine("StatRegen");
             //remove mana equal to the spell cost
-            regenStats[2][1] = regenStats[2][1] - spellCost;
+            if(selectClass == 1)
+            {
+                regenStats[2][1] = regenStats[2][1] - (int)(spellCost * 0.95f);
+            }
+            else
+            {
+                regenStats[2][1] = regenStats[2][1] - spellCost;
+            }
+
             // start regening stats
-            StartCoroutine(StatRegen());
+            StartCoroutine("StatRegen");
         }
 
         /// <summary>
@@ -354,11 +419,11 @@ namespace player
 
             // you are not at full hp anymore
             isFull = false;
-            StopCoroutine(StatRegen());
+            StopCoroutine("StatRegen");
             //deal a random amount of damage
             regenStats[0][1] = regenStats[0][1] - Random.Range(5, 40);
             //start regening stats
-            StartCoroutine(StatRegen());
+            StartCoroutine("StatRegen");
         }
 
         /// <summary>
@@ -367,7 +432,7 @@ namespace player
         public IEnumerator StatRegen()
         {
             //if you are not at full for every stat
-            while (isFull == false)
+            while (!isFull)
             {
                 //for every stat
                 for (int x = 0; x < regenStats.Length; x++)
@@ -431,9 +496,11 @@ namespace player
                     //put every race stat to text of the selected race
                     raceStatsText[i].text = raceStats[selectRace][i].ToString();
 
+                    classStatsText[i].text = classStats[selectClass][i].ToString();
+
                     //display the mutible stat of every stat and put to string
                     hudStats[i].text = stats[1][i].ToString();
-                    stats[1][i] = raceStats[selectRace][i] + stats[0][i];
+                    stats[1][i] = raceStats[selectRace][i] + classStats[selectClass][i] + stats[0][i];
                 }
             }
 
@@ -442,6 +509,9 @@ namespace player
             pointPoolText.text = pointPool.ToString();
             raceName.text = "Race: " + raceNames[selectRace];
             raceAbilityText.text = "Race Ability: " + raceAbilityString[selectRace];
+
+            className.text = "Class: " + classNames[selectClass];
+            classAbilityText.text = "Class Ability: " + classAbilityString[selectClass];
             #endregion
 
             //defines maxhp, max stamina, and max mana in that order
@@ -449,7 +519,6 @@ namespace player
             regenStats[0][0] = (stats[1][0] * 2) + (stats[1][2] * 5);
             regenStats[1][0] = stats[1][2] * 3;
             regenStats[2][0] = (stats[1][3] * 2) + (stats[1][4] * 4);
-            movementSpeed = 1.1f * stats[1][2];
             #endregion
 
             for (int i = 0; i < regenStats.Length; i++)

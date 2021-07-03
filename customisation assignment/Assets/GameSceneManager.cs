@@ -23,4 +23,9 @@ public class GameSceneManager : MonoBehaviour
     {
         SceneManager.LoadSceneAsync(1);
     }
+
+    public void ToMain()
+    {
+        SceneManager.LoadSceneAsync(0);
+    }
 }

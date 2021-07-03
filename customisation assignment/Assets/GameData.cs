@@ -10,9 +10,11 @@ public class GameData
     public int[] selectedCharacterLook;
     public string characterName;
     public int characterRace;
+    public int characterClass;
 
     public void SaveStats()
     {
+        characterClass = player.AssignableStatManager.selectClass;
         characterName = NewCustomisation.characterName;
         statRetainer = player.AssignableStatManager.stats;
         remainingPoints = player.AssignableStatManager.pointPool;
