@@ -80,6 +80,7 @@ public class NewCustomisation : MonoBehaviour
         }
     }
 
+    //loads character name
     public void NameInput(bool save)
     {
         if (save)

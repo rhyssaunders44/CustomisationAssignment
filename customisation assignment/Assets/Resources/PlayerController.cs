@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
             animation.SetFloat("Speed", 0);
         }
 
+    
 
 
         CharacterController controller = GetComponent<CharacterController>();
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour
         // Rotate around y - axis
         transform.Rotate(0, Input.GetAxis("Horizontal") * rotateSpeed, 0);
     }
+
 }
 
 

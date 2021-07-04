@@ -82,6 +82,9 @@ namespace player
 
         public bool running;
         int spellCost = 30;
+        public static bool regenerating;
+        public static bool healing;
+        private int regenTick = 0;
 
         bool isFull;
 
@@ -221,6 +224,18 @@ namespace player
                 //add a random amount of xp and check if the player is able to level up
                 xpCurrent = xpCurrent + Random.Range(5, 40);
                 LevelUp();
+            }
+
+            if (regenerating)
+            {
+                StartCoroutine("healthPotionRegen");
+                regenerating = false;
+            }
+
+            if (healing)
+            {
+                StatUpdate();
+                healing = false;
             }
         }
 
@@ -479,6 +494,30 @@ namespace player
                 yield return new WaitForSeconds(0.1f);
             }
             yield return 0;
+        }
+
+        public IEnumerator healthPotionRegen()
+        {
+            int maxRegen = 50;
+
+            if (regenTick < maxRegen)
+            {
+                regenTick++;
+                regenStats[0][1]++;
+                if(regenStats[0][1] > regenStats[0][0])
+                {
+                    regenStats[0][1] = regenStats[0][0];
+                }
+                StatUpdate();
+                yield return new WaitForSeconds(0.1f);
+                StartCoroutine("healthPotionRegen");
+            }
+            else
+            {
+                //regenTick = 0;
+                //StopCoroutine("healthPotionRegen");
+                yield return null;
+            }
         }
 
         /// <summary>
