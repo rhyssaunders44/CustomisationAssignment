@@ -27,8 +27,6 @@ public class PlayerController : MonoBehaviour
         }
 
     
-
-
         CharacterController controller = GetComponent<CharacterController>();
 
         if (Input.GetKey(KeyCode.LeftShift) && player.AssignableStatManager.regenStats[1][1] > 0)
