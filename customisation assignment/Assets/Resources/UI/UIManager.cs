@@ -10,10 +10,25 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Collider playerCollider; 
     [SerializeField] private GameObject dropSpawner;
     [SerializeField] private GameObject InvetoryPanel;
+    [SerializeField] private GameObject StatPanel;
+    [SerializeField] private GameObject Crosshair;
+    [SerializeField] private bool firstPerson;
     public static bool refreshItems;
     public static int refreshSlot;
+    [SerializeField] private GameObject helpPanel;
+    [SerializeField] private GameObject Map;
+    [SerializeField] private Text helpText;
+    [SerializeField] public bool helpOn;
+    public static bool dead;
+    [SerializeField] private GameObject deathPanel;
+    [SerializeField] private GameObject AxeObject;
+    [SerializeField] private GameObject HeadObject;
+    public bool mapUp;
+
+    [SerializeField] private CanvasGroup pickup;
 
     [SerializeField] private bool inventoryUp;
+    [SerializeField] private bool statsUp;
     [SerializeField] private Canvas canvas;
     [SerializeField] public static List<Items> inventoryItems = new List<Items>();
     [SerializeField] public List<Sprite> itemSprites = new List<Sprite>();
@@ -122,23 +137,67 @@ public class UIManager : MonoBehaviour
         #endregion
         inventoryItems.Capacity = 7;
         InGameItems = new Items[] { HealthPotion, Apple, Armour, Axe, Bow, Book, Boots, Bracers, Cloak, Gem, Gloves, Helmet, Ingot, Meat, ManaPotion, Necklace, Pants, Rings, Scroll, Shield, Shoulders, Sword, Belt };
+
+        //this could be an array of UI bools, it isnt.
         inventoryUp = false;
+        statsUp = false;
+        firstPerson = false;
+        helpOn = true;
+        mapUp = false;
+
         type = false;
 
         for (int i = 0; i < equippedItembool.Length; i++)
         {
             equippedItembool[i] = false;
         }
+        dead = false;
     }
 
-    void Update()
+    private void Update()
     {
-
         if (Input.GetKeyDown(KeyCode.I))
         {
             CloseInventory();
         }
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            CloseStats();
+        }
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            FpActive();
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            MapUp();
+        }
+
+        if (refreshItems)
+        {
+            RefreshOnPickup();
+            RefreshDisplay();
+        }
+
+        if (dead)
+        {
+            deathPanel.transform.position = canvas.pixelRect.center;
+            mapUp = false;
+            inventoryUp = false;
+            statsUp = false;
+        }
+        else
+        {
+            deathPanel.transform.position  = new Vector3(0, canvas.pixelRect.yMin - canvas.pixelRect.yMax);
+        }
+
+    }
+
+    void FixedUpdate()
+    {
         //the higher the magic number in the lerp, the faster it go
         if (inventoryUp)
         {
@@ -149,11 +208,76 @@ public class UIManager : MonoBehaviour
             InvetoryPanel.transform.position = new Vector3(Mathf.Lerp(InvetoryPanel.transform.position.x, canvas.pixelRect.xMax + canvas.pixelRect.xMax / 2, 4 * Time.deltaTime), canvas.pixelRect.center.y, 0);
         }
 
-        if (refreshItems)
+        if (statsUp)
         {
-            RefreshOnPickup();
-            RefreshDisplay();
+            StatPanel.transform.position = new Vector3(Mathf.Lerp(StatPanel.transform.position.x, canvas.pixelRect.center.x, 4 * Time.deltaTime), canvas.pixelRect.center.y, 0);
         }
+        else
+        {
+            StatPanel.transform.position = new Vector3(Mathf.Lerp(StatPanel.transform.position.x, canvas.pixelRect.xMin - canvas.pixelRect.xMax / 2, 4 * Time.deltaTime), canvas.pixelRect.center.y, 0);
+        }
+
+        if (helpOn)
+        {
+            helpPanel.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(helpPanel.transform.position.y, canvas.pixelRect.center.y, 4 * Time.deltaTime), 0);
+        }
+        else
+        {
+            helpPanel.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(helpPanel.transform.position.y, canvas.pixelRect.yMin - canvas.pixelRect.yMax /5, 4 * Time.deltaTime), 0);
+        }
+
+        if (mapUp)
+        {
+            Map.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(Map.transform.position.y, canvas.pixelRect.center.y, 4 * Time.deltaTime), 0);
+        }
+        else
+        {
+            Map.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(Map.transform.position.y, canvas.pixelRect.yMin - canvas.pixelRect.yMax / 2, 4 * Time.deltaTime), 0);
+        }
+
+
+    }
+
+    public void MapUp()
+    {
+        if (mapUp)
+        {
+            mapUp = false;
+        }
+        else
+        {
+            mapUp = true;
+        }
+    }
+
+    public void FpActive()
+    {
+        if (firstPerson)
+        {
+            firstPerson = false;
+            Crosshair.SetActive(false);
+        }
+        else
+        {
+            Crosshair.SetActive(true);
+            firstPerson = true;
+        }
+    }
+
+    public void HelpPanel()
+    {
+        if (!helpOn)
+        {
+            helpOn = true;
+            helpText.text = "X";
+        }
+
+        else
+        {
+            helpOn = false;
+            helpText.text = "^";
+        }
+
     }
 
     //tells the inventory where to try and go, out or in.
@@ -163,6 +287,14 @@ public class UIManager : MonoBehaviour
             inventoryUp = true;
         else
             inventoryUp = false;
+    }
+
+    public void CloseStats()
+    {
+        if (!statsUp)
+            statsUp = true;
+        else
+            statsUp = false;
     }
 
     //same as remove item but with an instatiate part, could probably be condensed but i lack motivation and time
@@ -211,7 +343,7 @@ public class UIManager : MonoBehaviour
         refreshItems = false;
         currencyText.text = currency.ToString();
 
-        //turn on your cute necklace glow
+        //turn on your cute necklace glow and visually equip items
         if(equippedItembool[10])
         {
             neckLight.SetActive(true);
@@ -220,6 +352,25 @@ public class UIManager : MonoBehaviour
         {
             neckLight.SetActive(false);
         }
+
+
+        if (equippedItembool[0])
+        {
+            HeadObject.SetActive(true);
+        }
+        else
+        {
+            HeadObject.SetActive(false);
+        }
+        if (equippedItembool[7])
+        {
+            AxeObject.SetActive(true);
+        }
+        else
+        {
+            AxeObject.SetActive(false);
+        }
+
     }
 
     public void UseItem(int usedItem)
@@ -240,7 +391,7 @@ public class UIManager : MonoBehaviour
                     Equip(0, 11);
                     break;
                 case ItemType.ChestArmour:
-                    Equip(1, 3);
+                    Equip(1, 2);
                     break;
                 case ItemType.LegArmour:
                     Equip(2, 16);
@@ -295,13 +446,11 @@ public class UIManager : MonoBehaviour
         //activate item sprite
         Color slotColor = EquippedItems[slotEquip].GetComponent<Image>().color;
         slotColor = Color.white;
-
   
         EquippedItemText[slotEquip].text = InGameItems[descriptionInt].description;
         equippedItemint[slotEquip] = descriptionInt;
         EquippedItems[slotEquip].GetComponent<Image>().sprite = itemSprites[descriptionInt];
         equippedItembool[slotEquip] = true;
-
     }
 
     //a button friendly dequip method
@@ -402,6 +551,7 @@ public class UIManager : MonoBehaviour
 
     public void RefreshOnPickup()
     {
+        Audio.boop = true;
         if(inventoryItems.Count < inventoryslots.Length)
         {
             if (!inventoryItems.Contains(InGameItems[refreshSlot]) || (inventoryItems.Contains(InGameItems[refreshSlot]) && InGameItems[refreshSlot].itemType != ItemType.Consumable))
@@ -413,6 +563,8 @@ public class UIManager : MonoBehaviour
             {
                 InGameItems[refreshSlot].itemCount++;
             }
+
+            StartCoroutine(PanelFlash(pickup));
         }
         else
         {
@@ -428,6 +580,16 @@ public class UIManager : MonoBehaviour
         refreshSlot = itemNumber;
         refreshItems = true;
     }
+
+    public IEnumerator PanelFlash(CanvasGroup flashGroup)
+    {
+        flashGroup.alpha = 1;
+        yield return new WaitForSeconds(0.06f);
+
+        flashGroup.alpha = 0;
+        yield return null;
+    }
+
 }
 
 
@@ -456,5 +618,3 @@ public class Items
 }
 
 public enum ItemType { Consumable, ChestArmour, FootArmour, HeadArmour, Shield, HandArmour , Shoulder, Cloak, WristArmour, LegArmour, RingSlot, NeckSlot, PrimaryWeapon, RangedWeapon, Material, Treasure, Belt };
-
-

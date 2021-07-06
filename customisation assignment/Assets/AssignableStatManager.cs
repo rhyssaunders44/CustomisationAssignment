@@ -27,8 +27,14 @@ namespace player
         public Text raceName;
         public Text raceAbilityText;
         public Text className;
+        public Text className1;
         public Text classAbilityText;
 
+        public CanvasGroup deathScreen;
+        public static bool dead;
+        public CanvasGroup helpCanvas;
+        [SerializeField] CanvasGroup pain;
+        [SerializeField] private CharacterController controller;
 
         public static int pointPool = 10;
         bool positive;
@@ -39,7 +45,7 @@ namespace player
 
         public string[] classNames;
         public string[] classAbilityString;
-
+        
 
         public class Race
         {
@@ -78,6 +84,7 @@ namespace player
         public Text levelCounter;
         int currentLevel;
         int levelMax;
+        private float dieTime;
         #endregion
 
         public bool running;
@@ -85,7 +92,8 @@ namespace player
         public static bool regenerating;
         public static bool healing;
         private int regenTick = 0;
-
+        [SerializeField] private GameObject Warrior;
+        [SerializeField] private GameObject Spawn;
         bool isFull;
 
         public void Start()
@@ -177,6 +185,8 @@ namespace player
                 FinishCharacter();
             }
 
+            dead = false;
+
             //update the in-game stats when the game loads
             StatUpdate();
         }
@@ -187,6 +197,20 @@ namespace player
             if (Input.GetKeyDown(KeyCode.P))
             {
                 TakeDamage();
+            }
+
+            if (regenStats[0][1] <= 0)
+            {
+                UIManager.dead = true;
+                Audio.dead = true;
+                dead = true;
+                helpCanvas.alpha = 0;
+                controller.enabled = false;
+                StopCoroutine("RegenStats");
+            }
+            else
+            {
+                Audio.dead = false;
             }
 
             //cast spell input
@@ -237,6 +261,35 @@ namespace player
                 StatUpdate();
                 healing = false;
             }
+        }
+
+        //scufffed method of implementing a death screen
+        private void FixedUpdate()
+        {
+            if(deathScreen.alpha < 1 && dead)
+            {
+                deathScreen.alpha = deathScreen.alpha + 0.01f;
+            }
+
+            if (!dead)
+            {
+                deathScreen.alpha = 0;
+            }
+
+            if(pain.alpha > 0)
+            {
+                pain.alpha = pain.alpha - 0.5f;
+            }
+        }
+
+        //a mess of gross conditions to fix up the spawn conditions
+        public void Respawn()
+        {
+            regenStats[0][1] = regenStats[0][0] / 8;
+            dead = false;
+            controller.enabled = true;
+            UIManager.dead = false;
+            Warrior.transform.TransformVector(Spawn.transform.position);
         }
 
         /// <summary>
@@ -404,6 +457,7 @@ namespace player
 
         }
 
+
         /// <summary>
         /// removes mana from the  player pool
         /// </summary>
@@ -431,7 +485,8 @@ namespace player
         /// </summary>
         public void TakeDamage()
         {
-
+            pain.alpha = 1;
+            Audio.pain = true;
             // you are not at full hp anymore
             isFull = false;
             StopCoroutine("StatRegen");
@@ -439,6 +494,11 @@ namespace player
             regenStats[0][1] = regenStats[0][1] - Random.Range(5, 40);
             //start regening stats
             StartCoroutine("StatRegen");
+        }
+
+        public void DeathTime()
+        {
+            dieTime = Time.time + 0.1f;
         }
 
         /// <summary>
@@ -550,6 +610,7 @@ namespace player
             raceAbilityText.text = "Race Ability: " + raceAbilityString[selectRace];
 
             className.text = "Class: " + classNames[selectClass];
+            className1.text = "Class: " + classNames[selectClass];
             classAbilityText.text = "Class Ability: " + classAbilityString[selectClass];
             #endregion
 
@@ -558,6 +619,7 @@ namespace player
             regenStats[0][0] = (stats[1][0] * 2) + (stats[1][2] * 5);
             regenStats[1][0] = stats[1][2] * 3;
             regenStats[2][0] = (stats[1][3] * 2) + (stats[1][4] * 4);
+
             #endregion
 
             for (int i = 0; i < regenStats.Length; i++)
