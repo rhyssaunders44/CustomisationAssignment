@@ -12,10 +12,13 @@ public class Audio : MonoBehaviour
     public AudioClip Boop;
     public AudioClip deathMusic;
     public AudioClip music;
+    public AudioClip levelupnoise;
     public CanvasGroup death;
     public static bool dead;
     public static bool pain;
     public static bool boop;
+    public static bool levelup;
+
 
     private void Start()
     {
@@ -46,16 +49,25 @@ public class Audio : MonoBehaviour
             clickmaker.Play();
             boop = false;
         }
-                
-        if(dead)
+
+        if (levelup)
+        {
+            clickmaker.clip = levelupnoise;
+            clickmaker.Play();
+            levelup = false;
+        }
+
+        if (dead)
         {
             Die();
-            Debug.Log("stilldead");
         }
         else
         {
             return;
         }
+
+
+
     }
 
 

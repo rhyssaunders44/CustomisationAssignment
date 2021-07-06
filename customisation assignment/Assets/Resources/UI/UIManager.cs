@@ -12,7 +12,74 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject InvetoryPanel;
     [SerializeField] private GameObject StatPanel;
     [SerializeField] private GameObject Crosshair;
+    [SerializeField] private GameObject DialoguePanel;
     [SerializeField] private bool firstPerson;
+    [SerializeField] private GameObject[] questOptions;
+    [SerializeField] private Image[] approvalBars;
+    [SerializeField] private GameObject[] highfive;
+    [SerializeField] private GameObject rewardButton;
+    [SerializeField] private GameObject rewardPanel;
+    private bool rewardclaimed =false;
+
+    public static bool[] activeQuests;
+    public static bool[] completedquest;
+    [SerializeField] private Text activeQuestText;
+    [SerializeField] private Text completedQuestText;
+    [SerializeField] private Text approvalText;
+    [SerializeField] private bool[] availableQuest;
+    [SerializeField] private GameObject[] acceptDecline;
+    [SerializeField] private GameObject QuestPanel;
+    public GameObject shootButton;
+    [SerializeField] private GameObject backButton;
+    [SerializeField] private GameObject seeQuestsButton;
+    [SerializeField] private GameObject[] BreezeResponse;
+    [SerializeField] private Text[] breezeResponseText;
+    [SerializeField] public static bool questCheck;
+    [SerializeField] public static ParticleSystem cheer;
+    [SerializeField] public static bool celebrate;
+    [SerializeField] public GameObject questCheckPopUp;
+    public int highlighedQuest;
+    public int questint;
+    public static bool startTalk;
+    int responseIndex;
+    public static float approval;
+    [SerializeField] private int dialogueLevel;
+    float approvalLevel;
+    [SerializeField] private string eggTalk;
+    [SerializeField] private Text eggtalkText;
+    int question1;
+
+    #region an array of mistakes
+    string[] questions0;
+    string[] questions1;
+    string[] questions2;
+    string[] questions3;
+    string[] questions4;
+    string[] questions5;
+    string[] questions6;
+
+
+    string[] answers0;
+    string[] answers1;
+    string[] answers2;
+    string[] answers3;
+    string[] answers4;
+    string[] answers5;
+    string[][] answerArray0;
+    string[][] answerArray1;
+    string[][] answerArray2;
+    string[][] answerArray3;
+    string[][][] answerGod;
+    string[][] questionArray0;
+    string[][] questionArray1;
+    string[][] questionArray2;
+    string[][] questionArray3;
+    string[][] questionArray4;
+    string[][][] questionGod;
+    int dialogueTier;
+    int question;
+    #endregion
+
     public static bool refreshItems;
     public static int refreshSlot;
     [SerializeField] private GameObject helpPanel;
@@ -24,7 +91,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject AxeObject;
     [SerializeField] private GameObject HeadObject;
     public bool mapUp;
-
+    public bool questUp;
+    public static bool chatting;
+    [SerializeField] private string[] questDescriptions;
     [SerializeField] private CanvasGroup pickup;
 
     [SerializeField] private bool inventoryUp;
@@ -106,7 +175,9 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         equippedItembool = new bool[14];
-
+        activeQuests = new bool[4];
+        completedquest = new bool[] {false, false, false, false };
+        rewardclaimed = false;
         //should read pain in the neck, semi-sure the load function is redundant. oh well
         // also load is not allowed outside of a method so its here instead of the ugly block above
         #region item initialisation
@@ -138,12 +209,52 @@ public class UIManager : MonoBehaviour
         inventoryItems.Capacity = 7;
         InGameItems = new Items[] { HealthPotion, Apple, Armour, Axe, Bow, Book, Boots, Bracers, Cloak, Gem, Gloves, Helmet, Ingot, Meat, ManaPotion, Necklace, Pants, Rings, Scroll, Shield, Shoulders, Sword, Belt };
 
+        #region multichoice
+
+        // this is just heresy
+        answers0 = new string[] { "yeah man", "actually nah" , null};
+        answers1 = new string[] { "not really..." , "dunno" , "yeah man!" };
+        answers2 = new string[] { "sucks to suck my dude", "Im sorry bro", null };
+        answers3 = new string[] { "yeah on second thought they're pretty cool", "I have no strong feelings about shoes.", "HOLY GOD DAMN LIGHTS?! IN A  S H O E ?!?" };
+        answers4 = new string[] { "BroJob" , "Lorna Shore" , "i dont listen to good music", null };
+        answers5 = new string[] { "what the hell are you talking about?", null, null };
+
+
+        questions0 = new string[] { "oh you wanna talk bro?", null, null };
+        questions1 = new string[] { "do you like my shoes bro?", null, null };
+        questions2 = new string[] { "thats pretty honest dude. honest but harsh", "you may not have given my fresh babies a proper check out. they light up bro.", "I'm all about enthusiasm bro. who's your favourite musician bro?" };
+        questions3 = new string[] { "brutal. savage. rekt, bro.", "no worries bro.", null ,null };
+        questions4 = new string[] { "thanks bro.", "get on my fly level before i go pogchamp on you omega lul.", "THEY ARE SO CASH MONEY RIGHT?" };
+        questions5 = new string[] { "never has the world seen a more brutal or slamming deathcore band", "a voice straight from the void. ride on.", "ew." };
+        questions6 = new string[] { "ok boomer.", null, null };
+
+
+        questionArray0 = new string[][] { questions0, null, null };
+        questionArray1 = new string[][] { questions1, null, null };
+        questionArray2 = new string[][] { questions2, questions3, questions4 };
+        questionArray3 = new string[][] { null, null, questions5 };
+        questionArray4 = new string[][] { null, null, questions6 };
+        questionGod = new string[][][] { questionArray0, questionArray1, questionArray2, questionArray3, questionArray4 };
+
+        answerArray0 = new string[][] { answers0 , null, null};
+        answerArray1 = new string[][] { answers1, null, null};
+        answerArray2 = new string[][] { answers2, answers3, answers4 };
+        answerArray3 = new string[][] { null, null, answers5 };
+        answerGod = new string[][][] { answerArray0, answerArray1, answerArray2, answerArray3 };
+        #endregion
+
+        questDescriptions = new string[] {"head to the blue particles" , "head to the red particles", "head to the yellow particles", "head to the white particles" };
+
         //this could be an array of UI bools, it isnt.
         inventoryUp = false;
         statsUp = false;
         firstPerson = false;
         helpOn = true;
         mapUp = false;
+        for (int i = 0; i < availableQuest.Length; i++)
+        {
+            availableQuest[i] = true;
+        }
 
         type = false;
 
@@ -176,6 +287,12 @@ public class UIManager : MonoBehaviour
             MapUp();
         }
 
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            QuestUp();
+        }
+
+
         if (refreshItems)
         {
             RefreshOnPickup();
@@ -192,6 +309,119 @@ public class UIManager : MonoBehaviour
         else
         {
             deathPanel.transform.position  = new Vector3(0, canvas.pixelRect.yMin - canvas.pixelRect.yMax);
+        }
+
+        if (chatting)
+        {
+            DialoguePanel.SetActive(true);
+        }
+        else
+        {
+            DialoguePanel.SetActive(false);
+            dialogueLevel = 0;
+            StopCoroutine("TalkGen");
+            for (int i = 0; i < BreezeResponse.Length; i++)
+            {
+                BreezeResponse[i].SetActive(false);
+            }
+        }
+
+        if (startTalk)
+        {
+            OpenDialogue();
+        }
+
+        if(approval <= -10)
+        {
+            approvalText.text = "disliked";
+        }
+        else if(approval > -10 && approval < 10)
+        {
+            approvalText.text = "neutral";
+        }
+        else
+        {
+            approvalText.text = "Liked";
+        }
+
+        if (questCheck)
+        {
+            QuestUpdate();
+        }
+
+    }
+
+    public static void StartChat()
+    {
+        startTalk = true;      
+    }
+
+    public void OpenDialogue()
+    {
+        for (int i = 0; i < highfive.Length; i++)
+        {
+            highfive[i].SetActive(true);
+        }
+
+        if(approval <= -20)
+        {
+            eggTalk = "I'm disappointed in you bro. have you come to say sorry bro?";
+        }
+        if(approval > -20 && approval <=-15 )
+        {
+            eggTalk = "why you gotta be mean bro?";
+        }
+        if(approval > -15 && approval <= -10)
+        {
+            eggTalk = "our friendship has fallen on hard times bro";
+        }
+        if(approval > -10 && approval <= -5)
+        {
+            eggTalk = "you haven't come to dog me again have you bro?";
+        }
+        if(approval > -5 && approval <= 0)
+        {
+            eggTalk = "suh bro";
+        }
+        if(approval > 0 && approval <= 5)
+        {
+            eggTalk = "hey bro";
+        }
+        if(approval > 5 && approval <= 10)
+        {
+            eggTalk = "Hey dawg! I missed my bro";
+        }
+        if(approval > 10 && approval <= 15)
+        {
+            eggTalk = "BRO! YOURE BACK!";
+        }
+        if(approval > 15 && approval <= 20)
+        {
+            eggTalk = "we're ride or die bro";
+        }
+        if(approval > 20)
+        {
+            eggTalk = "I care about the whole world... youre my whole world bro";
+        }
+
+        StartCoroutine("TalkGen");
+        startTalk = false;
+        if (approval > 0)
+        {
+            approvalLevel = -(approval / 20);
+            approvalBars[0].fillAmount = approvalLevel;
+        }
+        else if (approval == 0)
+        {
+            for (int i = 0; i < approvalBars.Length; i++)
+            {
+                approvalBars[i].fillAmount = 0;
+            }
+        }
+        else
+        {
+            approvalLevel = (approval / 20);
+            approvalBars[1].fillAmount = approvalLevel;
         }
 
     }
@@ -235,9 +465,586 @@ public class UIManager : MonoBehaviour
             Map.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(Map.transform.position.y, canvas.pixelRect.yMin - canvas.pixelRect.yMax / 2, 4 * Time.deltaTime), 0);
         }
 
+        if (questUp)
+        {
+            QuestPanel.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(QuestPanel.transform.position.y, canvas.pixelRect.center.y, 4 * Time.deltaTime), 0);
+        }
+        else
+        {
+            QuestPanel.transform.position = new Vector3(canvas.pixelRect.center.x, Mathf.Lerp(QuestPanel.transform.position.y, canvas.pixelRect.yMin - canvas.pixelRect.yMax / 2, 4 * Time.deltaTime), 0);
+        }
+        if (celebrate)
+        {
+            cheer.Play();
+        }
 
     }
 
+    public void HighFive(bool upTop)
+    {
+        StopCoroutine("TalkGen");
+        if (upTop)
+        {
+            approval += 5;
+            if (approvalLevel > 0)
+            {
+                eggTalk = "this better not be a trick bro";
+            }
+            if (approval < 10 && approval >= 0)
+            {
+                eggTalk = "hell yeah, stranger bro!";
+            }
+            if (approval >= 10 && approval < 20)
+            {
+                eggTalk = "My Man!";
+            }
+            if(approval >= 20)
+            {
+                eggTalk = "I can Always count on you, You're like my brother dawg";
+            }
+
+        }
+        else
+        {
+            approval -= 5;
+            if (approval > 0)
+            {
+                eggTalk = "this is why you don't have friends bro";
+            }
+            if (approval >= 0 && approval < 10)
+            {
+                eggTalk = "not cool bro";
+            }
+            if (approval >= 10 && approval < 20)
+            {
+                eggTalk = "You didn' have to do me like that dawg";
+            }
+            if (approval >= 20)
+            {
+                eggTalk = "We was brothers man!";
+            }
+        }
+
+        if (approval < 0)
+        {
+            approvalLevel = -(approval / 20);
+            approvalBars[0].fillAmount = approvalLevel;
+        }
+        else if(approval == 0)
+        {
+            for (int i = 0; i < approvalBars.Length; i++)
+            {
+                approvalBars[i].fillAmount = 0;
+            }
+        }
+        else
+        {
+            approvalLevel = (approval / 20);
+            approvalBars[1].fillAmount = approvalLevel;
+        }
+
+        shootButton.SetActive(true);
+        StartCoroutine("TalkGen");
+    }
+  
+    public void SeeQuests()
+    {
+        Next();
+        backButton.SetActive(true);
+        seeQuestsButton.SetActive(false);
+        for (int i = 0; i < highfive.Length; i++)
+        {
+            highfive[i].SetActive(false);
+        }
+
+        StopCoroutine("TalkGen");
+        if (approval <= -10)
+        {
+            eggTalk = "Nu-uh, nothing for you fake bro";
+        }
+        else if (approval > -10 && approval < 10)
+        {
+            eggTalk = "I am Entrusting you with these missions bro";
+            if (availableQuest[0] && !completedquest[0] && !activeQuests[0])
+                questOptions[0].SetActive(true);
+            else
+                questOptions[0].SetActive(false);
+
+            if (availableQuest[1] && !completedquest[1] && !activeQuests[1])
+                questOptions[1].SetActive(true);
+            else
+                questOptions[1].SetActive(false);
+
+        }
+        else
+        {
+            eggTalk = "Can you go get me some stuff bro?";
+            approvalText.text = "Liked";
+            for (int i = 0; i < questOptions.Length; i++)
+            {
+                if (availableQuest[i] && !completedquest[i] && !activeQuests[i])
+                    questOptions[i].SetActive(true);
+                else
+                    questOptions[i].SetActive(false);
+            }
+        }
+        StartCoroutine("TalkGen");
+    }
+
+    public void YourEternalReward()
+    {
+        StopCoroutine("TalkGen");
+        AddItem(0);
+        rewardButton.SetActive(false);
+        eggTalk = "thanks for doing that useless stuff for me, heres a healthpotion, check your inventory!";
+        rewardclaimed = true;
+        StartCoroutine("TalkGen");
+    }
+
+    public void AcceptQuest(int questAccepted)
+    {
+        for (int i = 0; i < questOptions.Length; i++)
+        {
+            if (completedquest[i])
+            {
+                questOptions[i].SetActive(false);
+            }
+        }
+
+        StopCoroutine("TalkGen");
+
+        switch (questAccepted)
+        {
+            case 0:
+                 eggTalk = "BRO I NEED YOU TO FETCH ME SOME OF THAT GLOWING STUFF FROM THE COOL BLUE PARTICLE EFFECTS, you can see its location with the blue diamond on the map";
+                break;
+            case 1:
+                eggTalk = "BRO I NEED YOU TO FETCH ME SOME OF THAT GLOWING STUFF FROM THE COOL RED PARTICLE EFFECTS, you can see its location with the red diamond on the map";
+                break;
+            case 2:
+                eggTalk = "BRO I NEED YOU TO FETCH ME SOME OF THAT GLOWING STUFF FROM THE COOL YELLOW PARTICLE EFFECTS, you can see its location with the yellow diamond on the map";
+                break;
+            case 3:
+                eggTalk = "BRO I NEED YOU TO FETCH ME SOME OF THAT GLOWING STUFF FROM THE COOL WHITE PARTICLE EFFECTS, , you can see its location with the white diamond on the map";
+                break;
+        }
+        questint = questAccepted;
+        backButton.SetActive(false);
+        acceptDecline[0].SetActive(true);
+        acceptDecline[1].SetActive(true);
+        StartCoroutine("TalkGen");
+        AJustEnd();
+    }
+
+    public void QuestIsOn(bool accepted)
+    {
+        activeQuestText.text = "";
+        StopCoroutine("TalkGen");
+        if (accepted)
+        {
+            eggTalk = "you're one in a million bro";
+            activeQuests[questint] = true;
+        }
+        else
+        {
+            eggTalk = "you cut me real deep bro";
+            backButton.SetActive(true);
+        }
+        acceptDecline[0].SetActive(false);
+        acceptDecline[1].SetActive(false);
+        StartCoroutine("TalkGen");
+
+        QuestUpdate();
+    }
+
+    public void QuestUpdate()
+    {
+        activeQuestText.text = "";
+        questCheckPopUp.SetActive(true);
+
+        for (int i = 0; i < questOptions.Length; i++)
+        {
+            if (completedquest[i])
+            {
+                questOptions[i].SetActive(false);
+            }
+        }
+
+        if((!questOptions[0].activeSelf && !questOptions[1].activeSelf && !questOptions[2].activeSelf && !questOptions[3].activeSelf) && approval > 20 && !rewardclaimed)
+        {
+            rewardButton.SetActive(true);
+        }
+
+        for (int i = 0; i < activeQuests.Length; i++)
+        {
+            if (activeQuests[i])
+            {
+                activeQuestText.text += questDescriptions[i];
+            }
+        }
+        questCheck = false;
+    }
+
+    //after trying and failing nested switches and a 3D array Im hardcoding it. sue me.
+    public void ShootTheBreeze()
+    {
+        StopCoroutine("TalkGen");
+        eggTalk = questionGod[0][0][0];
+        BreezeResponse[0].SetActive(true);
+        BreezeResponse[1].SetActive(true);
+        seeQuestsButton.SetActive(false);
+        shootButton.SetActive(false);
+        breezeResponseText[0].text = answerGod[0][0][0];
+        breezeResponseText[1].text = answerGod[0][0][1];
+        StartCoroutine("TalkGen");
+    }
+
+    //turns put not using return was the problem. this was neater but im not going to unf#@ck it.
+    //this is an unmitigated clusterf&%k of stupid proportions.
+    #region here there be monsters
+    public void QuestionTime(int response)
+    {
+
+        if (dialogueLevel == 0)
+        {
+            if (response == 1)
+            {
+                Back();
+                return;
+            }
+
+            for (int i = 0; i < BreezeResponse.Length; i++)
+            {
+                BreezeResponse[i].SetActive(true);
+            }
+
+            StreamA();
+            return;
+        }
+
+        if (dialogueLevel == 1)
+        {
+            question = response;
+            if(response == 0)
+            {
+                StreamA();
+            }
+            if (response == 1)
+            {
+                StreamB();
+            }
+            if(response == 2)
+            {
+                StreamC();
+            }
+            for (int i = 0; i < BreezeResponse.Length; i++)
+            {
+                BreezeResponse[i].SetActive(true);
+            }
+            return;
+        }
+
+        if (dialogueLevel == 2)
+        {
+            question1 = response;
+            if (response == 0)
+            {
+                StreamA();
+            }
+            if (response == 1)
+            {
+                if (question == 0)
+                {
+                    StreamA();
+                }
+                else
+                {
+                    StreamB();
+                }
+
+            }
+            if (response == 2)
+            {
+                StreamC();
+            }
+            return;
+        }
+
+        if (dialogueLevel == 3)
+        {
+            if (response == 0)
+            {
+               StreamA();
+            }
+            if (response == 1)
+            {
+                StreamB();
+            }
+            if (response == 2)
+            {
+                StreamC();
+            }
+            return;
+        }
+
+        if (dialogueLevel == 4)
+        {
+            StreamA();
+        }
+    }
+
+    public void StreamA()
+    {
+        Next();
+        Debug.Log("tick");
+        StopCoroutine("TalkGen");
+        if (dialogueLevel == 1)
+        {
+            eggTalk = questionGod[dialogueLevel][0][0];
+            for (int i = 0; i < breezeResponseText.Length; i++)
+            {
+                breezeResponseText[i].text = answerGod[dialogueLevel][0][i];
+            }
+        }
+        if(dialogueLevel == 2)
+        {
+            if (question == 2)
+            {
+                approval -= 5;
+                eggTalk = questionGod[3][2][0];
+                AJustEnd();
+            }
+            else
+            {
+                eggTalk = questionGod[dialogueLevel][1][0];
+                for (int i = 0; i < breezeResponseText.Length; i++)
+                {
+                    breezeResponseText[i].text = answerGod[dialogueLevel][0][i];
+                }
+            }
+        }
+        if (dialogueLevel == 3)
+        {
+
+            if (question == 1)
+            {
+                eggTalk = questionGod[2][2][0];
+            }
+
+            if(question == 0)
+            {
+                eggTalk = questionGod[2][1][1];
+            }
+
+            if(question == 2)
+            {
+                eggTalk = questionGod[3][2][0];
+            }
+            AJustEnd();
+        }
+        if(dialogueLevel == 4)
+        {
+            if (question == 1)
+            {
+                //lmao 420
+                eggTalk = questionGod[4][2][0];
+                AJustEnd();
+            }
+        }
+
+
+        StartCoroutine("TalkGen");
+    }
+
+    public void StreamB()
+    {
+        Debug.Log("tac");
+        Debug.Log(question);
+        Next();
+        StopCoroutine("TalkGen");
+        switch (dialogueLevel)
+        {
+            case 2:
+
+                eggTalk = questionGod[dialogueLevel][0][1];
+                for (int i = 0; i < breezeResponseText.Length; i++)
+                {
+                    breezeResponseText[i].text = answerGod[dialogueLevel][1][i];
+                }
+
+                break;
+
+            case 3:
+                {
+
+                    if (question == 2)
+                    {
+                        eggTalk = questionGod[3][2][1];
+                        AJustEnd();
+                    }
+                    else
+                    {
+                        eggTalk = questionGod[2][2][1];
+                        for (int i = 0; i < breezeResponseText.Length; i++)
+                        {
+                            breezeResponseText[i].text = answerGod[dialogueLevel][2][i];
+                        }
+                    }
+
+                }
+                break;
+
+            case 4:
+                approval -= 5;
+                eggTalk = questionGod[4][2][0];
+                AJustEnd();
+                break;
+
+
+        }
+
+
+        StartCoroutine("TalkGen");
+    }
+
+    public void HideReward()
+    {
+        rewardPanel.SetActive(false);
+    }
+
+    public void StreamC()
+    {
+        Debug.Log("toe");
+        Next();
+        StopCoroutine("TalkGen");
+        switch (dialogueLevel)
+        {
+            case 2:
+                eggTalk = questionGod[dialogueLevel][0][2];
+                for (int i = 0; i < breezeResponseText.Length; i++)
+                {
+                    breezeResponseText[i].text = answerGod[dialogueLevel][2][i];
+                }
+                break;
+
+            case 3:
+                {
+                    if (question == 1)
+                    {
+                        eggTalk = questionGod[2][2][2];
+                    }
+                    if (question == 2)
+                    {
+                        eggTalk = questionGod[3][2][2];
+                        approval -= 5;
+                    }
+                    AJustEnd();
+                }
+                break;
+        }
+
+    }
+
+    public void Next()
+    {
+        dialogueLevel += 1;
+        if (approval > 0)
+        {
+            approvalLevel = -(approval / 20);
+            approvalBars[0].fillAmount = approvalLevel;
+        }
+        else if (approval == 0)
+        {
+            for (int i = 0; i < approvalBars.Length; i++)
+            {
+                approvalBars[i].fillAmount = 0;
+            }
+        }
+        else
+        {
+            approvalLevel = (approval / 20);
+            approvalBars[1].fillAmount = approvalLevel;
+        }
+    }
+
+    public void Back()
+    {
+        StopCoroutine("TalkGen");
+        dialogueLevel = 0;
+        backButton.SetActive(false);
+        shootButton.SetActive(true);
+
+        for (int i = 0; i < BreezeResponse.Length; i++)
+        {
+            BreezeResponse[i].SetActive(false);
+        }
+        for (int i = 0; i < highfive.Length; i++)
+        {
+            highfive[i].SetActive(true);
+        }
+        for (int i = 0; i < questOptions.Length; i++)
+        {
+            questOptions[i].SetActive(false);
+        }
+        seeQuestsButton.SetActive(true);
+        OpenDialogue();
+
+    }
+
+    public void AJustEnd()
+    {
+        dialogueLevel = 0;
+        backButton.SetActive(false);
+        shootButton.SetActive(true);
+
+        for (int i = 0; i < BreezeResponse.Length; i++)
+        {
+            BreezeResponse[i].SetActive(false);
+        }
+        for (int i = 0; i < highfive.Length; i++)
+        {
+            highfive[i].SetActive(true);
+        }
+        for (int i = 0; i < questOptions.Length; i++)
+        {
+            questOptions[i].SetActive(false);
+        }
+        seeQuestsButton.SetActive(true);
+    }
+
+    #endregion
+
+    public IEnumerator TalkGen()
+    {
+        eggtalkText.text = "";
+
+        foreach(char c in eggTalk)
+        {
+            eggtalkText.text += c;
+            yield return new WaitForSeconds(0.05f);
+        }
+        yield return null;
+    }
+
+    #region panelLogic
+
+
+    //tells the inventory where to try and go, out or in.
+    public void CloseInventory()
+    {
+        if (!inventoryUp)
+            inventoryUp = true;
+        else
+            inventoryUp = false;
+    }
+
+    public void CloseStats()
+    {
+        if (!statsUp)
+            statsUp = true;
+        else
+            statsUp = false;
+    }
     public void MapUp()
     {
         if (mapUp)
@@ -280,23 +1087,22 @@ public class UIManager : MonoBehaviour
 
     }
 
-    //tells the inventory where to try and go, out or in.
-    public void CloseInventory()
+    public void QuestUp()
     {
-        if (!inventoryUp)
-            inventoryUp = true;
+        if (questUp)
+        {
+            questUp = false;
+            questCheckPopUp.SetActive(false);
+        }
         else
-            inventoryUp = false;
+        {
+            questUp = true;
+        }
     }
 
-    public void CloseStats()
-    {
-        if (!statsUp)
-            statsUp = true;
-        else
-            statsUp = false;
-    }
+    #endregion
 
+    #region ItemManagement
     //same as remove item but with an instatiate part, could probably be condensed but i lack motivation and time
     public void DropItem(int droppedItem)
     {
@@ -590,9 +1396,9 @@ public class UIManager : MonoBehaviour
         yield return null;
     }
 
+    #endregion
+
 }
-
-
 
 //allows some space saving higher up as i can just call it on one line.
 public class Items

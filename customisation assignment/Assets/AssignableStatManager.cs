@@ -45,8 +45,8 @@ namespace player
 
         public string[] classNames;
         public string[] classAbilityString;
-        
 
+        public static bool completeQuest;
         public class Race
         {
             public string name;
@@ -79,7 +79,7 @@ namespace player
         public GameObject[] hudObject;
 
         int xpMax;
-        int xpCurrent;
+        public static int xpCurrent;
         public Text xpTracker;
         public Text levelCounter;
         int currentLevel;
@@ -98,6 +98,8 @@ namespace player
 
         public void Start()
         {
+            completeQuest = new bool();
+            completeQuest = false;
             // defines all of the aspects of each race
             #region character management
             Race human = new Race();
@@ -185,6 +187,7 @@ namespace player
                 FinishCharacter();
             }
 
+
             dead = false;
 
             //update the in-game stats when the game loads
@@ -193,6 +196,18 @@ namespace player
 
         public void Update()
         {
+
+            if (completeQuest)
+            {
+                xpCurrent = xpCurrent + 200;
+                LevelUp();
+                completeQuest = false;
+            }
+
+            if(xpCurrent > xpMax)
+            {
+                LevelUp();
+            }
             //deal damage to the player 
             if (Input.GetKeyDown(KeyCode.P))
             {
@@ -261,6 +276,8 @@ namespace player
                 StatUpdate();
                 healing = false;
             }
+
+
         }
 
         //scufffed method of implementing a death screen
@@ -420,6 +437,7 @@ namespace player
                     stats[0][Random.Range(0, stats[0].Length)]++;
                     //update the stats
                     StatUpdate();
+                    Audio.levelup = true;
                 }
 
                 // remove the max hp from the current xp to get your new xp amount out of the new total
