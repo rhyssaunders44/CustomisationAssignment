@@ -19,6 +19,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject[] highfive;
     [SerializeField] private GameObject rewardButton;
     [SerializeField] private GameObject rewardPanel;
+    [SerializeField] private GameObject optionsPanel;
     private bool rewardclaimed =false;
 
     public static bool[] activeQuests;
@@ -349,6 +350,19 @@ public class UIManager : MonoBehaviour
             QuestUpdate();
         }
 
+    }
+
+
+    public void OptionsPanel()
+    {
+        if (optionsPanel.activeSelf)
+        {
+            optionsPanel.SetActive(false);
+        }
+        else
+        {
+            optionsPanel.SetActive(true);
+        }
     }
 
     public static void StartChat()
